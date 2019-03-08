@@ -1,6 +1,6 @@
 {
   "name": "timer",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "electron app",
   "main": "main.js",
   "scripts": {

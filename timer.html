@@ -36,9 +36,11 @@
                 return degree
             }
             
-            function updatePie( percent ) {
-                stuckDegree = stickTo30Multiple( percent * 360, 2.5 )
-                percent     = stuckDegree / 360
+            function updatePie( percent, manual = false ) {
+                if( manual ) {
+                    let stuckDegree = stickTo30Multiple( percent * 360, 2.5 )
+                    percent = stuckDegree / 360
+                }
                 
                 piePercent = percent
                 let [x, y] = getArcPosition( 1.0 - percent );
@@ -71,13 +73,13 @@
                         updatePie( 1 )
                         return
                     }
-                    updatePie( percent )
+                    updatePie( percent, true )
                 }
             } );
             $( document ).on( "mousedown", "#hand-overlay .effective", ( e ) => {
                 handDragged = true
                 percentBeforeDrag = piePercent
-                updatePie( getPercent( e.clientX, e.clientY ) )
+                updatePie( getPercent( e.clientX, e.clientY ), true )
             } );
             $( document ).on( "mouseup", ( e ) => {
                 if( handDragged ) handDragged = false
