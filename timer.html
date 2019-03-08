@@ -24,11 +24,23 @@
                     clearInterval( pieInterval );
                     pieInterval = null
                 }
-                piePercent += 1.0 / 3600.0;
-                updatePie( piePercent )
+                updatePie( piePercent + 1.0 / 3600.0 )
+            }
+            
+            function stickTo30Multiple( degree, threshold ) {
+                for( i = 0; i < 12; i++ ) {
+                    if( degree >= 30.0 * i - threshold && degree <= 30.0 * i + threshold ) {
+                        return 30.0 * i
+                    }
+                }
+                return degree
             }
             
             function updatePie( percent ) {
+                stuckDegree = stickTo30Multiple( percent * 360, 2.5 )
+                percent     = stuckDegree / 360
+                
+                piePercent = percent
                 let [x, y] = getArcPosition( 1.0 - percent );
                 x *= 0.2;
                 y *= 0.2;
@@ -45,21 +57,27 @@
             $( document ).on( "keydown", ( e ) => {
                 if( e.key == "Escape" ) {
                     handDragged = false
-                    piePercent = percentBeforeDrag
                     updatePie( percentBeforeDrag )
                 }
             } );
             $( document ).on( "mousemove", ( e ) => {
                 if( handDragged ) {
-                    piePercent = getPercent( e.clientX, e.clientY )
-                    updatePie( piePercent )
+                    let percent = getPercent( e.clientX, e.clientY )
+                    let lastPercent = piePercent
+                    if( percent >= 0.75 && lastPercent <= 0.25 ) {
+                        updatePie( 1 / 3600 )
+                        return
+                    } else if( percent <= 0.25 && lastPercent >= 0.75 ) {
+                        updatePie( 1 )
+                        return
+                    }
+                    updatePie( percent )
                 }
             } );
             $( document ).on( "mousedown", "#hand-overlay .effective", ( e ) => {
                 handDragged = true
                 percentBeforeDrag = piePercent
-                piePercent = getPercent( e.clientX, e.clientY )
-                updatePie( piePercent )
+                updatePie( getPercent( e.clientX, e.clientY ) )
             } );
             $( document ).on( "mouseup", ( e ) => {
                 if( handDragged ) handDragged = false
