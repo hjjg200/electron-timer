@@ -1,0 +1,130 @@
+* {
+  appearance: none;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: Lato;
+  margin: 0;
+  padding: 0;
+}
+htmlbody, bodybody {
+  border: none;
+  position: relative;
+}
+
+#body-wrap {
+  background: transparent;
+}
+
+#window-control-wrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 60px;
+  width: 30px;
+  opacity: 0;
+  background-color: transparent;
+  transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.1s, background-color cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+#window-control-wrap:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+#window-control {
+  -webkit-app-region: no-drag;
+  position: relative;
+}
+#window-control button {
+  background: none;
+  background-color: transparent;
+  color: white;
+  display: block;
+  height: 20px;
+  margin: 0;
+  border: none;
+  outline: none;
+  padding: 0;
+  line-height: 20px;
+  font-size: 16px;
+  width: 30px;
+  font-weight: bold;
+  user-select: none;
+  transition: background-color cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+#window-control button:hover {
+  background-color: black;
+}
+
+#drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc( 100% - 30px );
+  height: 100%;
+  border-radius: 50%;
+  -webkit-app-region: drag;
+}
+
+#circle-wrap {
+  position: absolute;
+  overflow: visible;
+  width: 95%;
+  height: 95%;
+  top: 0%;
+  left: 2.5%;
+}
+#circle-wrap > svg, #circle-wrap > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+#circle-wrap #circle-shadow {
+  border-radius: 50%;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  transform: scale(0.99);
+}
+#circle-wrap #circle-bg {
+  background-image: radial-gradient(#fff, #fafafa);
+  border-radius: 50%;
+  transform: scale(0.99);
+}
+#circle-wrap #hand circle {
+  fill: #444;
+}
+#circle-wrap #hand line {
+  stroke: #222;
+  stroke-width: 0.05;
+}
+#circle-wrap #hand-overlay-wrap {
+  overflow: hidden;
+}
+#circle-wrap #hand-overlay-wrap div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+#circle-wrap #hand-overlay-wrap .transform {
+  transform: scale(0.1, 0.2);
+}
+#circle-wrap #hand-overlay-wrap .effective {
+  height: 70%;
+  -webkit-app-region: no-drag;
+}
+#circle-wrap #hand-overlay-wrap .effective:hover {
+  cursor: pointer;
+}
+#circle-wrap #marks line {
+  stroke: #999;
+  stroke-width: 0.015;
+}
+#circle-wrap #pie {
+  fill: #ee3b2b;
+}
+
+/*# sourceMappingURL=timer.css.map */

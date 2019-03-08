@@ -1,0 +1,152 @@
+<html window-frame="solid">
+    <head>
+        <title></title>
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+        <script src="scripts/jquery.js"></script>
+        <script>
+            const { remote, ipcRenderer } = require( 'electron' );
+            $( document ).on( "click", "#button-close", function() {
+                ipcRenderer.send( 'close' );
+            } );
+            $( document ).on( "click", "#button-magnify", ( e ) => {
+                ipcRenderer.send( 'magnify', e.clientX, e.clientY );
+            } );
+            $( document ).on( "click", "#button-minify", ( e ) => {
+                ipcRenderer.send( 'minify', e.clientX, e.clientY );
+            } );
+
+            let percentBeforeDrag
+            let handDragged
+            let piePercent
+            let pieInterval
+            let intervalFunction = () => {
+                if( piePercent >= 1.0 ) {
+                    clearInterval( pieInterval );
+                    pieInterval = null
+                }
+                piePercent += 1.0 / 3600.0;
+                updatePie( piePercent )
+            }
+            
+            function updatePie( percent ) {
+                let [x, y] = getArcPosition( 1.0 - percent );
+                x *= 0.2;
+                y *= 0.2;
+                $( "#circle #pie" ).attr( "d", getSeries( 1.0 - percent ) );
+                $( "#hand line" ).attr( "x2", x ).attr( "y2", y );
+                
+                $( "#hand-overlay" ).css( "transform", `rotate(${percent * 360}deg)` )
+                
+                if( piePercent > 0 && pieInterval === null ) {
+                    pieInterval = setInterval( intervalFunction, 1000 )
+                }
+            }
+            
+            $( document ).on( "keydown", ( e ) => {
+                if( e.key == "Escape" ) {
+                    handDragged = false
+                    piePercent = percentBeforeDrag
+                    updatePie( percentBeforeDrag )
+                }
+            } );
+            $( document ).on( "mousemove", ( e ) => {
+                if( handDragged ) {
+                    piePercent = getPercent( e.clientX, e.clientY )
+                    updatePie( piePercent )
+                }
+            } );
+            $( document ).on( "mousedown", "#hand-overlay .effective", ( e ) => {
+                handDragged = true
+                percentBeforeDrag = piePercent
+                piePercent = getPercent( e.clientX, e.clientY )
+                updatePie( piePercent )
+            } );
+            $( document ).on( "mouseup", ( e ) => {
+                if( handDragged ) handDragged = false
+            } );
+
+            function getPercent( mx, my ) {
+                const [cx, cy] = evaluateCenterPosition()
+                const [dx, dy] = [mx - cx, my - cy]
+                const len = Math.sqrt( dx * dx + dy * dy )
+                const normFactor = 1.0 / len
+                const [nx, ny] = [dx * normFactor, dy * normFactor * -1]
+                
+                let degree = Math.acos( nx ) / Math.PI * 180
+                if( ny < 0 ) {
+                    if( nx < 0 ) {
+                        degree = ( 180 - degree ) + 180
+                    } else {
+                        degree = 360 - degree
+                    }
+                }
+                degree = ( 360 - degree ) + 90
+                degree = degree % 360
+
+                return degree / 360.0
+            }
+
+            function evaluateCenterPosition() {
+                const $circle = $( "#circle" )
+                const x = Math.floor( $circle.position().left + $circle.outerWidth() / 2 )
+                const y = Math.floor( $circle.position().top + $circle.outerHeight() / 2 )
+                return [x, y]
+            }
+
+            function getArcPosition( percent ) {
+                const x = Math.cos( 2 * Math.PI * percent );
+                const y = Math.sin( 2 * Math.PI * percent );
+                return [x, y];
+            }
+
+            function getSeries( percent ) {
+                const [x, y] = getArcPosition( percent );
+                const large = percent >= 0.5 ? 1 : 0;
+                return [
+                    `M 1 0`, // Move
+                    `A 1 1 0 ${large} 1 ${x} ${y}`, // Arc
+                    `L 0 0`, // Line
+                ].join( ' ' );
+            }
+
+            $( function() {
+                piePercent = 1.0 / 3600.0
+                pieInterval = setInterval( intervalFunction, 1000 );
+            } );
+        </script>
+        <link href="assets/stylesheets/timer.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div id="body-wrap">
+            <div id="drag-area"></div>
+            <div id="circle-wrap">
+                <div id="circle-shadow"></div>
+                <div id="circle-bg"></div>
+                <svg id="marks" viewBox="-1 -1 2 2" style="transform: rotate(-90deg) scale(0.99,-0.99);">
+                    <line x1="0.9" y1="0" x2="1" y2="0"></line><line x1="0.7794228634059949" y1="0.44999999999999996" x2="0.8660254037844387" y2="0.49999999999999994"></line><line x1="0.4500000000000001" y1="0.7794228634059948" x2="0.5000000000000001" y2="0.8660254037844386"></line><line x1="5.5109105961630896e-17" y1="0.9" x2="6.123233995736766e-17" y2="1"></line><line x1="-0.4499999999999998" y1="0.7794228634059949" x2="-0.4999999999999998" y2="0.8660254037844387"></line><line x1="-0.7794228634059949" y1="0.44999999999999996" x2="-0.8660254037844387" y2="0.49999999999999994"></line><line x1="-0.9" y1="1.1021821192326179e-16" x2="-1" y2="1.2246467991473532e-16"></line><line x1="-0.7794228634059948" y1="-0.4500000000000001" x2="-0.8660254037844386" y2="-0.5000000000000001"></line><line x1="-0.4500000000000004" y1="-0.7794228634059946" x2="-0.5000000000000004" y2="-0.8660254037844385"></line><line x1="-1.6532731788489269e-16" y1="-0.9" x2="-1.8369701987210297e-16" y2="-1"></line><line x1="0.4500000000000001" y1="-0.7794228634059948" x2="0.5000000000000001" y2="-0.8660254037844386"></line><line x1="0.7794228634059945" y1="-0.4500000000000004" x2="0.8660254037844384" y2="-0.5000000000000004"></line>
+                </svg>
+                <svg id="circle" viewBox="-1 -1 2 2" style="transform: rotate(-90deg) scale(1,-1);">
+                    <path id="pie" d="M 1 0 A 1 1 0 1 1 1.0 -0.00001 L 0 0"></path>
+                </svg>
+                <svg id="hand" viewBox="-1 -1 2 2" style="transform: rotate(-90deg) scale(1,-1);">
+                    <line x1="0" y1="0" x2="0.2" y2="0"></line>
+                    <circle cx="0" cy="0" r="0.1"></circle>
+                </svg>
+                <div id="hand-overlay-wrap">
+                    <div id="hand-overlay">
+                        <div class="transform">
+                            <div class="effective"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="window-control-wrap">
+                <div id="window-control">
+                    <button id="button-close">&times;</button>
+                    <button id="button-magnify">+</button>
+                    <button id="button-minify">-</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
