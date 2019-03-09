@@ -38,8 +38,15 @@
             
             function updatePie( percent, manual = false ) {
                 if( manual ) {
-                    let stuckDegree = stickTo30Multiple( percent * 360, 2.5 )
-                    percent = stuckDegree / 360
+                    let lastPercent = piePercent
+                    if( percent >= 0.75 && lastPercent <= 0.25 ) {
+                        percent = 1 / 3600
+                    } else if( percent <= 0.25 && lastPercent >= 0.75 ) {
+                        percent = 1
+                    } else {
+                        let stuckDegree = stickTo30Multiple( percent * 360, 2.5 )
+                        percent = stuckDegree / 360
+                    }
                 }
                 
                 piePercent = percent
@@ -65,14 +72,6 @@
             $( document ).on( "mousemove", ( e ) => {
                 if( handDragged ) {
                     let percent = getPercent( e.clientX, e.clientY )
-                    let lastPercent = piePercent
-                    if( percent >= 0.75 && lastPercent <= 0.25 ) {
-                        updatePie( 1 / 3600 )
-                        return
-                    } else if( percent <= 0.25 && lastPercent >= 0.75 ) {
-                        updatePie( 1 )
-                        return
-                    }
                     updatePie( percent, true )
                 }
             } );
