@@ -35,8 +35,7 @@ htmlbody, bodybody {
   position: relative;
 }
 #window-control button {
-  background: none;
-  background-color: #00000033;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 50%;
   color: white;
   display: block;
@@ -101,6 +100,12 @@ htmlbody, bodybody {
   stroke: #222;
   stroke-width: 0.05;
 }
+#circle-wrap #hand.dragged circle {
+  fill: #ff9f1a;
+}
+#circle-wrap #hand.dragged line {
+  stroke: #f2930d;
+}
 #circle-wrap #hand-overlay-wrap {
   overflow: hidden;
 }
@@ -123,7 +128,13 @@ htmlbody, bodybody {
 }
 #circle-wrap #marks line {
   stroke: #999;
-  stroke-width: 0.015;
+  stroke-dasharray: 0 0.92 0.03 0.05;
+}
+#circle-wrap #marks line.wide {
+  stroke-width: 0.025;
+}
+#circle-wrap #marks line.narrow {
+  stroke-width: 0.005;
 }
 #circle-wrap #pie {
   fill: #ee3b2b;

@@ -33,8 +33,7 @@ html, body {
     -webkit-app-region: no-drag;
     position: relative;
     button {
-        background: none;
-        background-color: #00000033;
+        background: rgba( 0, 0, 0, 0.2 );
         border-radius: 50%;
         color: white;
         display: block;
@@ -100,6 +99,14 @@ html, body {
             stroke: #222;
             stroke-width: 0.05;
         }
+        &.dragged {
+            circle {
+                fill: hsl( 35, 100%, 55%);
+            }
+            line {
+                stroke: hsl( 35, 90%, 50%);
+            }
+        }
     }
     #hand-overlay-wrap {
         overflow: hidden;
@@ -124,7 +131,13 @@ html, body {
     #marks {
         line {
             stroke: #999;
-            stroke-width: 0.015;
+            stroke-dasharray: 0 0.92 0.03 0.05;
+            &.wide {
+                stroke-width: 0.025;
+            }
+            &.narrow {
+                stroke-width: 0.005;
+            }
         }
     }
     #pie {

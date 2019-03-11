@@ -20,13 +20,14 @@
             let piePercent
             let pieInterval
             let intervalFunction = () => {
+                if( handDragged ) return
                 if( piePercent >= 1.0 ) {
                     clearInterval( pieInterval );
                     pieInterval = null
                 }
                 updatePie( piePercent + 1.0 / 3600.0 )
             }
-            
+
             function stickTo30Multiple( degree, threshold ) {
                 for( i = 0; i < 12; i++ ) {
                     if( degree >= 30.0 * i - threshold && degree <= 30.0 * i + threshold ) {
@@ -35,12 +36,12 @@
                 }
                 return degree
             }
-            
+
             function updatePie( percent, manual = false ) {
                 if( manual ) {
                     let lastPercent = piePercent
                     if( percent >= 0.75 && lastPercent <= 0.25 ) {
-                        percent = 1 / 3600
+                        percent = 0
                     } else if( percent <= 0.25 && lastPercent >= 0.75 ) {
                         percent = 1
                     } else {
@@ -48,24 +49,36 @@
                         percent = stuckDegree / 360
                     }
                 }
-                
+
                 piePercent = percent
                 let [x, y] = getArcPosition( 1.0 - percent );
                 x *= 0.2;
                 y *= 0.2;
                 $( "#circle #pie" ).attr( "d", getSeries( 1.0 - percent ) );
                 $( "#hand line" ).attr( "x2", x ).attr( "y2", y );
-                
+
                 $( "#hand-overlay" ).css( "transform", `rotate(${percent * 360}deg)` )
-                
-                if( piePercent > 0 && pieInterval === null ) {
+
+                if( piePercent < 1 && pieInterval === null ) {
                     pieInterval = setInterval( intervalFunction, 1000 )
                 }
             }
-            
+
+            function changeDragging( bool ) {
+                handDragged = bool
+                func = bool ? 'addClass' : 'removeClass'
+                $( "#hand" )[func]( "dragged" )
+            }
+            function startDragging() {
+                changeDragging( true )
+            }
+            function stopDragging() {
+                changeDragging( false )
+            }
+
             $( document ).on( "keydown", ( e ) => {
                 if( e.key == "Escape" ) {
-                    handDragged = false
+                    stopDragging()
                     updatePie( percentBeforeDrag )
                 }
             } );
@@ -76,12 +89,12 @@
                 }
             } );
             $( document ).on( "mousedown", "#hand-overlay .effective", ( e ) => {
-                handDragged = true
+                startDragging()
                 percentBeforeDrag = piePercent
                 updatePie( getPercent( e.clientX, e.clientY ), true )
             } );
             $( document ).on( "mouseup", ( e ) => {
-                if( handDragged ) handDragged = false
+                if( handDragged ) stopDragging()
             } );
 
             function getPercent( mx, my ) {
@@ -90,7 +103,7 @@
                 const len = Math.sqrt( dx * dx + dy * dy )
                 const normFactor = 1.0 / len
                 const [nx, ny] = [dx * normFactor, dy * normFactor * -1]
-                
+
                 let degree = Math.acos( nx ) / Math.PI * 180
                 if( ny < 0 ) {
                     if( nx < 0 ) {
@@ -128,6 +141,20 @@
                 ].join( ' ' );
             }
 
+            function addMarks() {
+                $( "#marks" ).empty()
+                for( let i = 0; i < 60; i++ ) {
+                    const [x, y] = getArcPosition( i * 6 / 360 )
+                    $( "#marks" ).append( $( "<line>", {
+                        class: i % 5 == 0 ? "wide" : "narrow",
+                        "x1": 0,
+                        "y1": 0,
+                        "x2": x,
+                        "y2": y
+                    } ) )
+                }
+            }
+
             $( function() {
                 piePercent = 1.0 / 3600.0
                 pieInterval = setInterval( intervalFunction, 1000 );
@@ -142,7 +169,7 @@
                 <div id="circle-shadow"></div>
                 <div id="circle-bg"></div>
                 <svg id="marks" viewBox="-1 -1 2 2" style="transform: rotate(-90deg) scale(0.99,-0.99);">
-                    <line x1="0.9" y1="0" x2="1" y2="0"></line><line x1="0.7794228634059949" y1="0.44999999999999996" x2="0.8660254037844387" y2="0.49999999999999994"></line><line x1="0.4500000000000001" y1="0.7794228634059948" x2="0.5000000000000001" y2="0.8660254037844386"></line><line x1="5.5109105961630896e-17" y1="0.9" x2="6.123233995736766e-17" y2="1"></line><line x1="-0.4499999999999998" y1="0.7794228634059949" x2="-0.4999999999999998" y2="0.8660254037844387"></line><line x1="-0.7794228634059949" y1="0.44999999999999996" x2="-0.8660254037844387" y2="0.49999999999999994"></line><line x1="-0.9" y1="1.1021821192326179e-16" x2="-1" y2="1.2246467991473532e-16"></line><line x1="-0.7794228634059948" y1="-0.4500000000000001" x2="-0.8660254037844386" y2="-0.5000000000000001"></line><line x1="-0.4500000000000004" y1="-0.7794228634059946" x2="-0.5000000000000004" y2="-0.8660254037844385"></line><line x1="-1.6532731788489269e-16" y1="-0.9" x2="-1.8369701987210297e-16" y2="-1"></line><line x1="0.4500000000000001" y1="-0.7794228634059948" x2="0.5000000000000001" y2="-0.8660254037844386"></line><line x1="0.7794228634059945" y1="-0.4500000000000004" x2="0.8660254037844384" y2="-0.5000000000000004"></line>
+                    <line class="wide" x1="0" y1="0" x2="1" y2="0"></line><line class="narrow" x1="0" y1="0" x2="0.9945218953682733" y2="0.10452846326765346"></line><line class="narrow" x1="0" y1="0" x2="0.9781476007338057" y2="0.20791169081775931"></line><line class="narrow" x1="0" y1="0" x2="0.9510565162951535" y2="0.3090169943749474"></line><line class="narrow" x1="0" y1="0" x2="0.9135454576426009" y2="0.40673664307580015"></line><line class="wide" x1="0" y1="0" x2="0.8660254037844387" y2="0.49999999999999994"></line><line class="narrow" x1="0" y1="0" x2="0.8090169943749475" y2="0.5877852522924731"></line><line class="narrow" x1="0" y1="0" x2="0.7431448254773942" y2="0.6691306063588582"></line><line class="narrow" x1="0" y1="0" x2="0.6691306063588582" y2="0.7431448254773942"></line><line class="narrow" x1="0" y1="0" x2="0.5877852522924731" y2="0.8090169943749475"></line><line class="wide" x1="0" y1="0" x2="0.5000000000000001" y2="0.8660254037844386"></line><line class="narrow" x1="0" y1="0" x2="0.4067366430758004" y2="0.9135454576426009"></line><line class="narrow" x1="0" y1="0" x2="0.30901699437494745" y2="0.9510565162951535"></line><line class="narrow" x1="0" y1="0" x2="0.20791169081775923" y2="0.9781476007338057"></line><line class="narrow" x1="0" y1="0" x2="0.10452846326765346" y2="0.9945218953682733"></line><line class="wide" x1="0" y1="0" x2="6.123233995736766e-17" y2="1"></line><line class="narrow" x1="0" y1="0" x2="-0.10452846326765333" y2="0.9945218953682734"></line><line class="narrow" x1="0" y1="0" x2="-0.20791169081775912" y2="0.9781476007338057"></line><line class="narrow" x1="0" y1="0" x2="-0.30901699437494734" y2="0.9510565162951536"></line><line class="narrow" x1="0" y1="0" x2="-0.4067366430758001" y2="0.913545457642601"></line><line class="wide" x1="0" y1="0" x2="-0.4999999999999998" y2="0.8660254037844387"></line><line class="narrow" x1="0" y1="0" x2="-0.587785252292473" y2="0.8090169943749475"></line><line class="narrow" x1="0" y1="0" x2="-0.6691306063588579" y2="0.7431448254773945"></line><line class="narrow" x1="0" y1="0" x2="-0.7431448254773944" y2="0.669130606358858"></line><line class="narrow" x1="0" y1="0" x2="-0.8090169943749473" y2="0.5877852522924732"></line><line class="wide" x1="0" y1="0" x2="-0.8660254037844387" y2="0.49999999999999994"></line><line class="narrow" x1="0" y1="0" x2="-0.913545457642601" y2="0.40673664307580004"></line><line class="narrow" x1="0" y1="0" x2="-0.9510565162951535" y2="0.3090169943749475"></line><line class="narrow" x1="0" y1="0" x2="-0.9781476007338057" y2="0.20791169081775931"></line><line class="narrow" x1="0" y1="0" x2="-0.9945218953682733" y2="0.10452846326765373"></line><line class="wide" x1="0" y1="0" x2="-1" y2="1.2246467991473532e-16"></line><line class="narrow" x1="0" y1="0" x2="-0.9945218953682733" y2="-0.1045284632676535"></line><line class="narrow" x1="0" y1="0" x2="-0.9781476007338057" y2="-0.20791169081775907"></line><line class="narrow" x1="0" y1="0" x2="-0.9510565162951535" y2="-0.30901699437494773"></line><line class="narrow" x1="0" y1="0" x2="-0.9135454576426011" y2="-0.4067366430757998"></line><line class="wide" x1="0" y1="0" x2="-0.8660254037844386" y2="-0.5000000000000001"></line><line class="narrow" x1="0" y1="0" x2="-0.8090169943749475" y2="-0.587785252292473"></line><line class="narrow" x1="0" y1="0" x2="-0.7431448254773942" y2="-0.6691306063588582"></line><line class="narrow" x1="0" y1="0" x2="-0.6691306063588585" y2="-0.743144825477394"></line><line class="narrow" x1="0" y1="0" x2="-0.5877852522924732" y2="-0.8090169943749473"></line><line class="wide" x1="0" y1="0" x2="-0.5000000000000004" y2="-0.8660254037844385"></line><line class="narrow" x1="0" y1="0" x2="-0.4067366430758001" y2="-0.913545457642601"></line><line class="narrow" x1="0" y1="0" x2="-0.30901699437494756" y2="-0.9510565162951535"></line><line class="narrow" x1="0" y1="0" x2="-0.2079116908177598" y2="-0.9781476007338056"></line><line class="narrow" x1="0" y1="0" x2="-0.10452846326765423" y2="-0.9945218953682733"></line><line class="wide" x1="0" y1="0" x2="-1.8369701987210297e-16" y2="-1"></line><line class="narrow" x1="0" y1="0" x2="0.10452846326765387" y2="-0.9945218953682733"></line><line class="narrow" x1="0" y1="0" x2="0.20791169081775943" y2="-0.9781476007338056"></line><line class="narrow" x1="0" y1="0" x2="0.30901699437494723" y2="-0.9510565162951536"></line><line class="narrow" x1="0" y1="0" x2="0.40673664307579976" y2="-0.9135454576426011"></line><line class="wide" x1="0" y1="0" x2="0.5000000000000001" y2="-0.8660254037844386"></line><line class="narrow" x1="0" y1="0" x2="0.5877852522924729" y2="-0.8090169943749476"></line><line class="narrow" x1="0" y1="0" x2="0.6691306063588585" y2="-0.743144825477394"></line><line class="narrow" x1="0" y1="0" x2="0.7431448254773937" y2="-0.6691306063588588"></line><line class="narrow" x1="0" y1="0" x2="0.8090169943749473" y2="-0.5877852522924734"></line><line class="wide" x1="0" y1="0" x2="0.8660254037844384" y2="-0.5000000000000004"></line><line class="narrow" x1="0" y1="0" x2="0.913545457642601" y2="-0.40673664307580015"></line><line class="narrow" x1="0" y1="0" x2="0.9510565162951535" y2="-0.3090169943749476"></line><line class="narrow" x1="0" y1="0" x2="0.9781476007338056" y2="-0.20791169081775987"></line><line class="narrow" x1="0" y1="0" x2="0.9945218953682733" y2="-0.1045284632676543"></line>
                 </svg>
                 <svg id="circle" viewBox="-1 -1 2 2" style="transform: rotate(-90deg) scale(1,-1);">
                     <path id="pie" d="M 1 0 A 1 1 0 1 1 1.0 -0.00001 L 0 0"></path>

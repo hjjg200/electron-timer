@@ -1,6 +1,6 @@
 {
   "name": "timer",
-  "version": "1.7.1",
+  "version": "1.8.1",
   "description": "electron app",
   "main": "main.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "author": "anton",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.0.7",
+    "electron": "^4.0.8",
     "electron-builder": "^20.38.5",
     "electron-packager": "^13.1.0"
   },
@@ -31,5 +31,8 @@
     "directories": {
       "output": "dist"
     }
+  },
+  "dependencies": {
+    "npm": "^6.9.0"
   }
 }
