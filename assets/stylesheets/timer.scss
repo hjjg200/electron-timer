@@ -87,7 +87,7 @@ html, body {
         transform: scale( 0.99 );
     }
     #circle-bg {
-        background-image: radial-gradient( #fff, #fafafa );
+        background: white;
         border-radius: 50%;
         transform: scale( 0.99 );
     }
@@ -131,12 +131,18 @@ html, body {
     #marks {
         line {
             stroke: #999;
-            stroke-dasharray: 0 0.92 0.03 0.05;
+
+            @mixin line-from-to( $from, $to ) {
+                stroke-dasharray: 0 $from $to - $from 1 - $to;
+            }
+
             &.wide {
                 stroke-width: 0.025;
+                @include line-from-to( 0.9, 0.96 );
             }
             &.narrow {
                 stroke-width: 0.005;
+                @include line-from-to( 0.92, 0.96 );
             }
         }
     }

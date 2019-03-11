@@ -89,7 +89,7 @@ htmlbody, bodybody {
   transform: scale(0.99);
 }
 #circle-wrap #circle-bg {
-  background-image: radial-gradient(#fff, #fafafa);
+  background: white;
   border-radius: 50%;
   transform: scale(0.99);
 }
@@ -128,13 +128,14 @@ htmlbody, bodybody {
 }
 #circle-wrap #marks line {
   stroke: #999;
-  stroke-dasharray: 0 0.92 0.03 0.05;
 }
 #circle-wrap #marks line.wide {
   stroke-width: 0.025;
+  stroke-dasharray: 0 0.9 0.06 0.04;
 }
 #circle-wrap #marks line.narrow {
   stroke-width: 0.005;
+  stroke-dasharray: 0 0.92 0.04 0.04;
 }
 #circle-wrap #pie {
   fill: #ee3b2b;
