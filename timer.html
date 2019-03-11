@@ -21,11 +21,14 @@
             let pieInterval
             let intervalFunction = () => {
                 if( handDragged ) return
-                if( piePercent >= 1.0 ) {
+                let nextPercent = piePercent + 1.0 / 3600.0
+                if( nextPercent >= 1.0 ) {
                     clearInterval( pieInterval );
                     pieInterval = null
+                    updatePie( 1 )
+                    return
                 }
-                updatePie( piePercent + 1.0 / 3600.0 )
+                updatePie( nextPercent )
             }
 
             function stickTo30Multiple( degree, threshold ) {
@@ -38,6 +41,7 @@
             }
 
             function updatePie( percent, manual = false ) {
+
                 if( manual ) {
                     let lastPercent = piePercent
                     if( percent >= 0.75 && lastPercent <= 0.25 ) {
