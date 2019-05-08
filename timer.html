@@ -4,7 +4,9 @@
         <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
         <script src="scripts/jquery.js"></script>
         <script>
-            const { remote, ipcRenderer } = require( 'electron' );
+            // Import
+            const { remote, ipcRenderer, webFrame } = require( 'electron' );
+
             $( document ).on( "click", "#button-close", function() {
                 ipcRenderer.send( 'close' );
             } );
@@ -14,6 +16,28 @@
             $( document ).on( "click", "#button-minify", ( e ) => {
                 ipcRenderer.send( 'minify', e.clientX, e.clientY );
             } );
+
+            // Wheel Zooming
+
+            let switchDrag = ( ok ) => {
+                $( "#drag-area" ).css( "-webkit-app-region", ( !ok ? "no-" : "" ) + "drag" )
+            }
+            $( document ).on( "keydown keyup mousedown mouseup mousemove focus blur wheel", ( e ) => {
+
+                e.preventDefault()
+                switchDrag( !e.ctrlKey )
+
+                if( e.type == 'wheel' ) {
+                    if( e.originalEvent.deltaY < 0 ) {
+                        // Zoom in
+                        ipcRenderer.send( 'magnify', e.clientX, e.clientY )
+                    } else {
+                        // Zoom out
+                        ipcRenderer.send( 'minify', e.clientX, e.clientY )
+                    }
+                }
+
+            } )
 
             let percentBeforeDrag
             let handDragged
@@ -190,13 +214,13 @@
                     </div>
                 </div>
             </div>
-            <div id="window-control-wrap">
+            <!-- <div id="window-control-wrap">
                 <div id="window-control">
                     <button id="button-close">&times;</button>
-                    <button id="button-magnify">+</button>
+                     <button id="button-magnify">+</button>
                     <button id="button-minify">-</button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </body>
 </html>

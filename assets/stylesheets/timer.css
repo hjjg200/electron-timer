@@ -117,10 +117,10 @@ htmlbody, bodybody {
   height: 100%;
 }
 #circle-wrap #hand-overlay-wrap .transform {
-  transform: scale(0.1, 0.2);
+  transform: scale(0.1, 1);
 }
 #circle-wrap #hand-overlay-wrap .effective {
-  height: 70%;
+  height: 50%;
   -webkit-app-region: no-drag;
 }
 #circle-wrap #hand-overlay-wrap .effective:hover {

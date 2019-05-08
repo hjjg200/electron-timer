@@ -4,6 +4,8 @@ const path = require( 'path' );
 
 const { app, BrowserWindow, ipcMain } = electron;
 
+const minSize = 32
+
 let mainWindow;
 
 ipcMain.on( 'close', function() {
@@ -11,21 +13,21 @@ ipcMain.on( 'close', function() {
 } );
 
 ipcMain.on( 'magnify', ( e, ox, oy ) => {
-  const w = Math.floor( mainWindow.getSize()[0] * 1.2 );
+  const w = Math.floor( mainWindow.getSize()[0] * 1.1 )
   setSizeWithOrigin( { w: w, h: w }, { x: ox, y: oy } )
 } );
 
 ipcMain.on( 'minify', ( e, ox, oy ) => {
-  const w = Math.floor( mainWindow.getSize()[0] / 1.2 );
+  const w = Math.floor( mainWindow.getSize()[0] / 1.1 )
   setSizeWithOrigin( { w: w, h: w }, { x: ox, y: oy } )
 } );
 
 function setSizeWithOrigin( size, origin ) {
-  const [minw, minh] = [90, 90]
-  if( size.w < minw || size.h < minh ) {
-    return
+  if( size.w < minSize || size.h < minSize ) {
+    size.w = minSize
+    size.h = minSize
   }
-  
+
   const [w, h] = mainWindow.getSize()
   const [owp, ohp] = [origin.x / w, origin.y / h]
   const [dw, dh] = [w - size.w, h - size.h]
@@ -40,8 +42,8 @@ function setSizeWithOrigin( size, origin ) {
 
 app.on( 'ready', function() {
   mainWindow = new BrowserWindow( {
-    minWidth: 90,
-    minHeight: 90,
+    minWidth: minSize,
+    minHeight: minSize,
     width: 250,
     height: 250,
     frame: false,
@@ -49,7 +51,7 @@ app.on( 'ready', function() {
     transparent: true
   } );
   mainWindow.setResizable( false );
-  mainWindow.setMinimumSize( 50, 50 );
+  mainWindow.setMinimumSize( minSize, minSize );
   mainWindow.loadURL( url.format( {
     pathname: path.join( __dirname, 'timer.html' ),
     protocol: 'file:',

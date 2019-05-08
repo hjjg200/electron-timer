@@ -118,10 +118,10 @@ html, body {
             height: 100%;
         }
         .transform {
-            transform: scale( 0.1, 0.2 );
+            transform: scale( 0.1, 1 );
         }
         .effective {
-            height: 70%;
+            height: 50%;
             -webkit-app-region: no-drag;
             &:hover {
                 cursor: pointer;
