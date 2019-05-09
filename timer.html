@@ -20,23 +20,24 @@
             // Wheel Zooming
 
             let switchDrag = ( ok ) => {
-                $( "#drag-area" ).css( "-webkit-app-region", ( !ok ? "no-" : "" ) + "drag" )
+                if( ok )
+                    $( "#scroll-area" ).hide()
+                else
+                    $( "#scroll-area" ).show()
             }
-            $( document ).on( "keydown keyup mousedown mouseup mousemove focus blur wheel", ( e ) => {
-
+            $( document ).on( "wheel", "#scroll-area", ( e ) => {
+                e.preventDefault()
+                if( e.originalEvent.deltaY < 0 ) {
+                    // Zoom in
+                    ipcRenderer.send( 'magnify', e.clientX, e.clientY )
+                } else {
+                    // Zoom out
+                    ipcRenderer.send( 'minify', e.clientX, e.clientY )
+                }
+            } )
+            $( document ).on( "keydown keyup", ( e ) => {
                 e.preventDefault()
                 switchDrag( !e.ctrlKey )
-
-                if( e.type == 'wheel' ) {
-                    if( e.originalEvent.deltaY < 0 ) {
-                        // Zoom in
-                        ipcRenderer.send( 'magnify', e.clientX, e.clientY )
-                    } else {
-                        // Zoom out
-                        ipcRenderer.send( 'minify', e.clientX, e.clientY )
-                    }
-                }
-
             } )
 
             let percentBeforeDrag
@@ -221,6 +222,7 @@
                     <button id="button-minify">-</button>
                 </div>
             </div> -->
+            <div id="scroll-area"></div>
         </div>
     </body>
 </html>
